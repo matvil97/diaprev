@@ -2,7 +2,7 @@ import React from "react";
 
 export function Card({ children, className = "" }: { children: React.ReactNode; className?: string }) {
   return (
-    <div className={"rounded-3xl border border-white/70 bg-white/80 backdrop-blur-xl shadow-sm " + className}>
+    <div className={`glass rounded-3xl border backdrop-blur-xl shadow-sm ${className}`}>
       {children}
     </div>
   );
@@ -12,11 +12,7 @@ export function CardHeader({ title, subtitle }: { title: string; subtitle?: stri
   return (
     <div className="p-6 pb-0">
       <h1 className="text-2xl font-semibold tracking-tight text-gray-900">{title}</h1>
-      {subtitle && (
-        <p className="mt-2 text-[15px] leading-relaxed text-gray-700">
-          {subtitle}
-        </p>
-      )}
+      {subtitle && <p className="mt-2 text-[15px] leading-relaxed text-gray-700">{subtitle}</p>}
     </div>
   );
 }

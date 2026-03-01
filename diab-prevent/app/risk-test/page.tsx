@@ -52,6 +52,7 @@ export default function RiskTestPage() {
           title="Test de risque (simple & bienveillant)"
           subtitle="Pas de bonne ou mauvaise réponse. On cherche juste à vous orienter."
         />
+
         <CardBody className="space-y-6">
           <div className="flex flex-wrap gap-2">
             <Badge>~2 minutes</Badge>
@@ -69,7 +70,9 @@ export default function RiskTestPage() {
                 : "On y va tranquille. Réponds au feeling 🙂"
             }
           />
-          <div className="rounded-2xl border border-white/70 bg-white/85 p-5 shadow-sm">
+
+          {/* Bloc questions */}
+          <div className="glass rounded-2xl border p-5 shadow-sm">
             {step === 1 && (
               <Select
                 label="Tranche d’âge"
@@ -147,17 +150,19 @@ export default function RiskTestPage() {
             )}
           </div>
 
-          <div className="rounded-2xl border border-white/70 bg-white/85 p-5 shadow-sm">
+          {/* Le saviez-vous */}
+          <div className="glass rounded-2xl border p-5 shadow-sm">
             <div className="text-xs font-medium text-gray-700">Le saviez-vous ?</div>
             <div className="mt-1 text-sm text-gray-900">{fact}</div>
           </div>
 
+          {/* Consentement */}
           {step === totalSteps && (
-            <div className="rounded-2xl bg-white/85 border border-white/70 p-4 text-sm text-gray-800 shadow-sm">
+            <div className="glass rounded-2xl border p-4 text-sm text-gray-800 shadow-sm">
               <label className="flex items-start gap-2">
                 <input
                   type="checkbox"
-                  className="mt-1"
+                  className="mt-1 accent-gray-900"
                   checked={consent}
                   onChange={(e) => setConsent(e.target.checked)}
                 />

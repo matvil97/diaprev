@@ -24,3 +24,47 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+/* ---------- Premium health-tech contrast fix ---------- */
+:root{
+  --text: #0f172a;        /* slate-900 */
+  --muted: #334155;       /* slate-700 */
+  --muted-2: #475569;     /* slate-600 */
+  --card-bg: rgba(255,255,255,.88);
+  --card-border: rgba(255,255,255,.72);
+}
+
+body{
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Force better contrast for "muted" texts on mobile */
+p, small, .text-muted {
+  color: var(--muted);
+}
+
+/* iOS Safari often renders select text too light: force it */
+select, option{
+  color: var(--text) !important;
+}
+
+/* Sometimes iOS uses text-fill-color instead of color */
+select{
+  -webkit-text-fill-color: var(--text);
+  background-color: rgba(255,255,255,.95);
+}
+
+/* Make your glass surfaces slightly more opaque everywhere */
+.glass{
+  background: var(--card-bg);
+  border-color: var(--card-border);
+}
+
+/* Navbar links: prevent “washed out” */
+header nav a{
+  color: var(--muted);
+}
+header nav a:hover{
+  color: var(--text);
+}
