@@ -1,10 +1,16 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import type { RiskAnswers, RiskResult } from "@/lib/types";
 import { computeRisk } from "@/lib/scoring";
 import { saveResult } from "@/lib/storage";
+import { DID_YOU_KNOW } from "@/lib/facts";
+import { AvatarCoach } from "@/components/AvatarCoach";
+import { Progress } from "@/components/Progress";
+import { Card, CardBody, CardHeader, Button, Badge } from "@/components/ui";
+
+const totalSteps = 7;
 
 const defaultAnswers: RiskAnswers = {
   ageRange: "under40",
@@ -18,114 +24,167 @@ const defaultAnswers: RiskAnswers = {
 
 export default function RiskTestPage() {
   const [a, setA] = useState<RiskAnswers>(defaultAnswers);
+  const [step, setStep] = useState(1);
   const [consent, setConsent] = useState(false);
   const router = useRouter();
 
-  function submit() {
+  const fact = useMemo(() => DID_YOU_KNOW[(step - 1) % DID_YOU_KNOW.length], [step]);
+
+  function next() {
+    setStep((s) => Math.min(totalSteps, s + 1));
+  }
+  function back() {
+    setStep((s) => Math.max(1, s - 1));
+  }
+
+  function finish() {
     if (!consent) return;
-
     const { score, level } = computeRisk(a);
-    const result: RiskResult = {
-      score,
-      level,
-      answers: a,
-      createdAt: new Date().toISOString(),
-    };
-
+    const result: RiskResult = { score, level, answers: a, createdAt: new Date().toISOString() };
     saveResult(result);
     router.push("/result");
   }
 
   return (
     <div className="space-y-6">
-      <h1 className="text-xl font-semibold">Test de risque (indicatif)</h1>
-
-      <div className="rounded-2xl border p-5 space-y-5">
-        <Select
-          label="Tranche d’âge"
-          value={a.ageRange}
-          onChange={(v) => setA({ ...a, ageRange: v as RiskAnswers["ageRange"] })}
-          options={[
-            ["under40", "Moins de 40 ans"],
-            ["40to55", "40–55 ans"],
-            ["over55", "Plus de 55 ans"],
-          ]}
+      <Card>
+        <CardHeader
+          title="Test de risque (simple & bienveillant)"
+          subtitle="Pas de bonne ou mauvaise réponse. On cherche juste à vous orienter."
         />
+        <CardBody className="space-y-6">
+          <div className="flex flex-wrap gap-2">
+            <Badge>~2 minutes</Badge>
+            <Badge>Stockage local</Badge>
+            <Badge>RGPD by design</Badge>
+          </div>
 
-        <Select
-          label="IMC (approx.)"
-          value={a.bmiRange}
-          onChange={(v) => setA({ ...a, bmiRange: v as RiskAnswers["bmiRange"] })}
-          options={[
-            ["under25", "< 25"],
-            ["25to30", "25–30"],
-            ["over30", "> 30"],
-          ]}
-        />
+          <Progress current={step} total={totalSteps} />
 
-        <Select
-          label="Activité physique"
-          value={a.activity}
-          onChange={(v) => setA({ ...a, activity: v as RiskAnswers["activity"] })}
-          options={[
-            ["active", "Régulière (≥ 150 min/sem)"],
-            ["some", "Occasionnelle"],
-            ["sedentary", "Sédentaire"],
-          ]}
-        />
+          <AvatarCoach
+            mood={step === totalSteps ? "focus" : "happy"}
+            message={
+              step === totalSteps
+                ? "Dernière étape ! Ensuite je te donne un score indicatif + des conseils."
+                : "On y va tranquille. Réponds au feeling 🙂"
+            }
+          />
 
-        <Toggle
-          label="Antécédents familiaux de diabète (parents/fratrie)"
-          checked={a.familyHistory}
-          onChange={(checked) => setA({ ...a, familyHistory: checked })}
-        />
+          <div className="rounded-2xl border border-white/50 bg-white/60 p-5">
+            {step === 1 && (
+              <Select
+                label="Tranche d’âge"
+                value={a.ageRange}
+                onChange={(v) => setA({ ...a, ageRange: v as RiskAnswers["ageRange"] })}
+                options={[
+                  ["under40", "Moins de 40 ans"],
+                  ["40to55", "40–55 ans"],
+                  ["over55", "Plus de 55 ans"],
+                ]}
+              />
+            )}
 
-        <Toggle
-          label="Hypertension (diagnostiquée) ou traitement"
-          checked={a.highBloodPressure}
-          onChange={(checked) => setA({ ...a, highBloodPressure: checked })}
-        />
+            {step === 2 && (
+              <Select
+                label="IMC (approx.)"
+                value={a.bmiRange}
+                onChange={(v) => setA({ ...a, bmiRange: v as RiskAnswers["bmiRange"] })}
+                options={[
+                  ["under25", "< 25"],
+                  ["25to30", "25–30"],
+                  ["over30", "> 30"],
+                ]}
+              />
+            )}
 
-        <Select
-          label="Boissons sucrées"
-          value={a.sugaryDrinks}
-          onChange={(v) => setA({ ...a, sugaryDrinks: v as RiskAnswers["sugaryDrinks"] })}
-          options={[
-            ["rare", "Rarement / jamais"],
-            ["sometimes", "Parfois"],
-            ["often", "Souvent"],
-          ]}
-        />
+            {step === 3 && (
+              <Select
+                label="Activité physique"
+                value={a.activity}
+                onChange={(v) => setA({ ...a, activity: v as RiskAnswers["activity"] })}
+                options={[
+                  ["active", "Régulière (≥ 150 min/sem)"],
+                  ["some", "Occasionnelle"],
+                  ["sedentary", "Sédentaire"],
+                ]}
+              />
+            )}
 
-        <Toggle
-          label="Tour de taille élevé (indicatif)"
-          checked={a.waistRisk}
-          onChange={(checked) => setA({ ...a, waistRisk: checked })}
-        />
+            {step === 4 && (
+              <Toggle
+                label="Antécédents familiaux (parents/fratrie)"
+                checked={a.familyHistory}
+                onChange={(checked) => setA({ ...a, familyHistory: checked })}
+              />
+            )}
 
-        <div className="rounded-xl bg-gray-50 p-4 text-sm text-gray-700">
-          <label className="flex items-start gap-2">
-            <input
-              type="checkbox"
-              className="mt-1"
-              checked={consent}
-              onChange={(e) => setConsent(e.target.checked)}
-            />
-            <span>
-              J’accepte que mes réponses soient utilisées pour calculer un score <b>localement</b>
-              sur mon appareil. Je comprends que ce test n’est pas un dispositif médical.
-            </span>
-          </label>
-        </div>
+            {step === 5 && (
+              <Toggle
+                label="Hypertension (diagnostiquée) ou traitement"
+                checked={a.highBloodPressure}
+                onChange={(checked) => setA({ ...a, highBloodPressure: checked })}
+              />
+            )}
 
-        <button
-          onClick={submit}
-          disabled={!consent}
-          className="rounded-xl bg-black px-4 py-2 text-white disabled:opacity-40"
-        >
-          Voir mon résultat
-        </button>
-      </div>
+            {step === 6 && (
+              <Select
+                label="Boissons sucrées"
+                value={a.sugaryDrinks}
+                onChange={(v) => setA({ ...a, sugaryDrinks: v as RiskAnswers["sugaryDrinks"] })}
+                options={[
+                  ["rare", "Rarement / jamais"],
+                  ["sometimes", "Parfois"],
+                  ["often", "Souvent"],
+                ]}
+              />
+            )}
+
+            {step === 7 && (
+              <Toggle
+                label="Tour de taille élevé (indicatif)"
+                checked={a.waistRisk}
+                onChange={(checked) => setA({ ...a, waistRisk: checked })}
+              />
+            )}
+          </div>
+
+          <div className="rounded-2xl border border-white/50 bg-white/60 p-5">
+            <div className="text-xs text-gray-500">Le saviez-vous ?</div>
+            <div className="mt-1 text-sm text-gray-800">{fact}</div>
+          </div>
+
+          {step === totalSteps && (
+            <div className="rounded-2xl bg-white/70 border border-white/60 p-4 text-sm text-gray-700">
+              <label className="flex items-start gap-2">
+                <input
+                  type="checkbox"
+                  className="mt-1"
+                  checked={consent}
+                  onChange={(e) => setConsent(e.target.checked)}
+                />
+                <span>
+                  J’accepte le calcul du score <b>localement</b> sur mon appareil. Je comprends que ce test n’est pas
+                  un dispositif médical.
+                </span>
+              </label>
+            </div>
+          )}
+
+          <div className="flex justify-between">
+            <Button variant="secondary" onClick={back} disabled={step === 1}>
+              Retour
+            </Button>
+
+            {step < totalSteps ? (
+              <Button onClick={next}>Suivant</Button>
+            ) : (
+              <Button onClick={finish} disabled={!consent}>
+                Terminer & voir le résultat
+              </Button>
+            )}
+          </div>
+        </CardBody>
+      </Card>
     </div>
   );
 }
@@ -140,7 +199,7 @@ function Select(props: {
     <div className="space-y-2">
       <div className="text-sm font-medium">{props.label}</div>
       <select
-        className="w-full rounded-xl border p-2"
+        className="w-full rounded-2xl border border-white/60 bg-white/70 p-3 outline-none focus:ring-2 focus:ring-gray-900/10"
         value={props.value}
         onChange={(e) => props.onChange(e.target.value)}
       >
@@ -154,11 +213,7 @@ function Select(props: {
   );
 }
 
-function Toggle(props: {
-  label: string;
-  checked: boolean;
-  onChange: (v: boolean) => void;
-}) {
+function Toggle(props: { label: string; checked: boolean; onChange: (v: boolean) => void }) {
   return (
     <label className="flex items-center justify-between gap-4">
       <span className="text-sm font-medium">{props.label}</span>
@@ -166,7 +221,7 @@ function Toggle(props: {
         type="checkbox"
         checked={props.checked}
         onChange={(e) => props.onChange(e.target.checked)}
-        className="h-5 w-5"
+        className="h-5 w-5 accent-gray-900"
       />
     </label>
   );
