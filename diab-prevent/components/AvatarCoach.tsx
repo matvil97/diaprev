@@ -11,12 +11,13 @@ export function AvatarCoach({
 
   return (
     <div className="flex items-start gap-3">
-      <div className="h-12 w-12 rounded-2xl bg-white/70 border border-white/60 grid place-items-center text-2xl">
+      <div className="h-12 w-12 rounded-2xl bg-white/85 border border-white/70 shadow-sm grid place-items-center text-2xl">
         {face}
       </div>
-      <div className="rounded-2xl bg-white/70 border border-white/60 px-4 py-3">
-        <div className="text-xs text-gray-500">{name}</div>
-        <div className="text-sm text-gray-800">{message}</div>
+
+      <div className="rounded-2xl bg-white/85 border border-white/70 shadow-sm px-4 py-3">
+        <div className="text-xs font-medium text-gray-700">{name}</div>
+        <div className="text-sm text-gray-900">{message}</div>
       </div>
     </div>
   );

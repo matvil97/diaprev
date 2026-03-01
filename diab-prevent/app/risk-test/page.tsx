@@ -69,8 +69,7 @@ export default function RiskTestPage() {
                 : "On y va tranquille. Réponds au feeling 🙂"
             }
           />
-
-          <div className="rounded-2xl border border-white/50 bg-white/60 p-5">
+          <div className="rounded-2xl border border-white/70 bg-white/85 p-5 shadow-sm">
             {step === 1 && (
               <Select
                 label="Tranche d’âge"
@@ -148,13 +147,13 @@ export default function RiskTestPage() {
             )}
           </div>
 
-          <div className="rounded-2xl border border-white/50 bg-white/60 p-5">
-            <div className="text-xs text-gray-500">Le saviez-vous ?</div>
-            <div className="mt-1 text-sm text-gray-800">{fact}</div>
+          <div className="rounded-2xl border border-white/70 bg-white/85 p-5 shadow-sm">
+            <div className="text-xs font-medium text-gray-700">Le saviez-vous ?</div>
+            <div className="mt-1 text-sm text-gray-900">{fact}</div>
           </div>
 
           {step === totalSteps && (
-            <div className="rounded-2xl bg-white/70 border border-white/60 p-4 text-sm text-gray-700">
+            <div className="rounded-2xl bg-white/85 border border-white/70 p-4 text-sm text-gray-800 shadow-sm">
               <label className="flex items-start gap-2">
                 <input
                   type="checkbox"
@@ -197,9 +196,9 @@ function Select(props: {
 }) {
   return (
     <div className="space-y-2">
-      <div className="text-sm font-medium">{props.label}</div>
+      <div className="text-sm font-medium text-gray-900">{props.label}</div>
       <select
-        className="w-full rounded-2xl border border-white/60 bg-white/70 p-3 outline-none focus:ring-2 focus:ring-gray-900/10"
+        className="w-full rounded-2xl border border-white/70 bg-white p-3 shadow-sm outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-200"
         value={props.value}
         onChange={(e) => props.onChange(e.target.value)}
       >
@@ -216,7 +215,7 @@ function Select(props: {
 function Toggle(props: { label: string; checked: boolean; onChange: (v: boolean) => void }) {
   return (
     <label className="flex items-center justify-between gap-4">
-      <span className="text-sm font-medium">{props.label}</span>
+      <span className="text-sm font-medium text-gray-900">{props.label}</span>
       <input
         type="checkbox"
         checked={props.checked}
